@@ -20,6 +20,6 @@ func main() {
 	router.HandleFunc("/songs/{id}", h.UpdateSong).Methods(http.MethodPut)
 	router.HandleFunc("/songs/{id}", h.DeleteSong).Methods(http.MethodDelete)
 
-	log.Println("API is running...")
+  log.Println("API is running...    port 3000")
 	http.ListenAndServe(":3000", router)
 }

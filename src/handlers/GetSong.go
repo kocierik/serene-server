@@ -1,5 +1,26 @@
 package handlers
 
-import "net/http"
+import (
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"strconv"
 
-func (h handler) GetSong(w http.ResponseWriter, r *http.Request) {}
+	"github.com/gorilla/mux"
+	"github.com/kocierik/SwiftServe/src/models"
+)
+
+func (h handler) GetSong(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, _ := strconv.Atoi(vars["id"])
+
+	var song models.Music
+
+	if result := h.DB.First(&song, id); result.Error != nil {
+		fmt.Println(result.Error)
+	}
+
+	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(song)
+}
