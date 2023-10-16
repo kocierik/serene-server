@@ -8,6 +8,10 @@ import (
 	"github.com/kocierik/SwiftServe/src/models"
 )
 
+type Response struct {
+	Songs []models.Music `json:"songs"`
+}
+
 func (h handler) GetAllSongs(w http.ResponseWriter, r *http.Request) {
 	var songs []models.Music
 
@@ -15,7 +19,14 @@ func (h handler) GetAllSongs(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(result.Error)
 	}
 
-	w.Header().Add("Content-Type", "application/json")
+	response := Response{Songs: songs}
+
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(songs)
+
+	if err := json.NewEncoder(w).Encode(response.Songs); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }

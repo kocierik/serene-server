@@ -8,4 +8,7 @@ type Music struct {
 	Format   string `json:"format"`
 	Duration int    `json:"duration"`
 	Path     string `json:"path"`
+	Artist   string `json:"artist"`
+	Album    string `json:"album"`
+	Picture  []byte `json:"picture"`
 }
