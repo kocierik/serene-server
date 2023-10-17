@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 	"strconv"
@@ -12,8 +13,6 @@ import (
 func (h handler) GetSong(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, _ := strconv.Atoi(vars["id"])
-	if id == 1 {
-	}
 
 	if r.Method == http.MethodOptions {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -23,7 +22,8 @@ func (h handler) GetSong(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	filePath := "/etc/music/rick.mp3"
+	idString := fmt.Sprintf("%v", id)
+	filePath := "/etc/music/" + idString
 	songFile, err := os.Open(filePath)
 	if err != nil {
 		http.Error(w, "File not found", http.StatusNotFound)
