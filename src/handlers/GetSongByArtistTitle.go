@@ -1,18 +1,19 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
 	"os"
-	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gorilla/mux"
 )
 
-func (h handler) GetSong(w http.ResponseWriter, r *http.Request) {
+func (h handler) GetSongByArtistTitle(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	id, _ := strconv.Atoi(vars["id"])
+	artistTitle := vars["songName"]
+	artistTitleTrimmed := strings.ReplaceAll(artistTitle, " ", "")
+	// fmt.Println("artistTitle:", artistTitleTrimmed)
 
 	if r.Method == http.MethodOptions {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -22,8 +23,8 @@ func (h handler) GetSong(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	idString := fmt.Sprintf("%v", id)
-	filePath := "/etc/music/" + idString
+	filePath := "/etc/music/" + artistTitleTrimmed
+
 	songFile, err := os.Open(filePath)
 	if err != nil {
 		http.Error(w, "File not found", http.StatusNotFound)

@@ -15,11 +15,12 @@ func main() {
 	router := mux.NewRouter()
 
 	router.HandleFunc("/songs", h.GetAllSongs).Methods(http.MethodGet)
-	router.HandleFunc("/songs/{id}", h.GetSong).Methods(http.MethodGet)
+	router.HandleFunc("/songs/{id}", h.GetSongById).Methods(http.MethodGet)
 	router.HandleFunc("/songs", h.AddSong).Methods(http.MethodPost)
+	router.HandleFunc("/songName/{songName}", h.GetSongByArtistTitle).Methods(http.MethodGet)
 	router.HandleFunc("/songs/{id}", h.UpdateSong).Methods(http.MethodPut)
 	router.HandleFunc("/songs/{id}", h.DeleteSong).Methods(http.MethodDelete)
 
-  log.Println("API is running...    port 4000")
+	log.Println("API is running...    port 4000")
 	http.ListenAndServe(":4000", router)
 }
