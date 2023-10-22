@@ -18,6 +18,6 @@
 # vendor/
 
 postgres-data
-
+.env
 # Go workspace file
 go.work
