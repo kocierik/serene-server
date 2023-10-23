@@ -16,13 +16,13 @@ func (h handler) GetVideoYt(w http.ResponseWriter, r *http.Request) {
 	}
 
 	apiKey := os.Getenv("YOUTUBE_API_KEY")
-
 	query := r.URL.Query().Get("query")
 
 	if query == "" {
 		http.Error(w, "La query non può essere vuota", http.StatusBadRequest)
 		return
 	}
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 
 	endpoint := "https://www.googleapis.com/youtube/v3/search?key=" + apiKey + "&part=snippet&q=" + query + "&type=video"
 
