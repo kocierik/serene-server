@@ -21,6 +21,7 @@ func main() {
 	router.HandleFunc("/songs/{id}", h.UpdateSong).Methods(http.MethodPut)
 	router.HandleFunc("/songs/{id}", h.DeleteSong).Methods(http.MethodDelete)
 	router.HandleFunc("/search", h.GetVideoYt).Methods(http.MethodGet)
+	router.HandleFunc("/downloadSong", h.DownloadSong).Methods(http.MethodGet)
 
 	log.Println("API is running...    port 4000")
 	http.ListenAndServe(":4000", router)
