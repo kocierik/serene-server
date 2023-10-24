@@ -18,14 +18,18 @@ output_file="song.mp3"
 yt-dlp --extract-audio --audio-format mp3 --add-metadata --embed-thumbnail --output "$output_file" "$URL_DEL_VIDEO"
 
 if [ $? -eq 0 ]; then
-  artist=$(exiftool -Artist "$output_file" | cut -d ":" -f 2 | xargs)
   title=$(exiftool -Title "$output_file" | cut -d ":" -f 2 | xargs)
 
-  sanitized_artist=$(sanitizeInput "$artist")
   sanitized_title=$(sanitizeInput "$title")
 
-  new_filename="/etc/music/${sanitized_artist}${sanitized_title}"
+
+
+  new_filename="/etc/music/${sanitized_title}"
   mv "$output_file" "$new_filename"
+
+  duration=$(ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "$new_filename")
+  id3v2 --TLEN "$duration" "$new_filename"
+
 
   echo "Download completato con successo. File rinominato in: $new_filename"
 else
