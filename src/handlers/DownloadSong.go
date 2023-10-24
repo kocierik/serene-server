@@ -7,7 +7,19 @@ import (
 )
 
 func (h handler) DownloadSong(w http.ResponseWriter, r *http.Request) {
-	cmd := exec.Command("/bin/bash", "uploadSong.sh", "https://www.youtube.com/watch?v=lZiaYpD9ZrI")
+	queryURL := r.URL.Query().Get("query")
+
+	if queryURL == "" {
+		http.Error(w, "L'url non e' valido ", http.StatusBadRequest)
+		return
+	}
+
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	queryURL = "https://www.youtube.com/watch?v=" + queryURL
+	cmd := exec.Command("/bin/bash", "uploadSong.sh", queryURL)
 	err := cmd.Run()
 	if err != nil {
 		fmt.Println("Errore", err)
