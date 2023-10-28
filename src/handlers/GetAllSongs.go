@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/gin-gonic/gin"
 	"github.com/kocierik/SwiftServe/src/models"
 )
 
@@ -12,7 +13,7 @@ type Response struct {
 	Songs []models.Music `json:"songs"`
 }
 
-func (h handler) GetAllSongs(w http.ResponseWriter, r *http.Request) {
+func (h handler) GetAllSongs(c *gin.Context) {
 	var songs []models.Music
 
 	if result := h.DB.Find(&songs); result.Error != nil {
@@ -21,12 +22,12 @@ func (h handler) GetAllSongs(w http.ResponseWriter, r *http.Request) {
 
 	response := Response{Songs: songs}
 
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
+	c.Header("Access-Control-Allow-Origin", "*")
+	c.Header("Content-Type", "application/json")
+	c.Status(http.StatusOK)
 
-	if err := json.NewEncoder(w).Encode(response.Songs); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	if err := json.NewEncoder(c.Writer).Encode(response.Songs); err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 }

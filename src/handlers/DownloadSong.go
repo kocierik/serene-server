@@ -4,28 +4,30 @@ import (
 	"fmt"
 	"net/http"
 	"os/exec"
+
+	"github.com/gin-gonic/gin"
 )
 
-func (h handler) DownloadSong(w http.ResponseWriter, r *http.Request) {
-	queryURL := r.URL.Query().Get("query")
+func (h handler) DownloadSong(c *gin.Context) {
+	queryURL := c.Query("query")
 
 	if queryURL == "" {
-		http.Error(w, "L'url non e' valido ", http.StatusBadRequest)
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "L'url non e' valido"})
 		return
 	}
 
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
+	c.Header("Access-Control-Allow-Origin", "*")
+	c.Header("Content-Type", "application/json")
+	c.Status(http.StatusOK)
 
 	queryURL = "https://www.youtube.com/watch?v=" + queryURL
 	cmd := exec.Command("/bin/bash", "uploadSong.sh", queryURL)
 	err := cmd.Run()
 	if err != nil {
 		fmt.Println("Errore", err)
-		http.Error(w, "Errore durante l'esecuzione dello script", http.StatusInternalServerError)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Errore durante l'esecuzione dello script"})
 		return
 	}
 	fmt.Println("Download completato con successo.")
-	w.Write([]byte("Download completato con successo."))
+	c.Writer.Write([]byte("Download completato con successo."))
 }

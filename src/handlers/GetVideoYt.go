@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
 
@@ -97,39 +98,40 @@ func getVideoDetails(videoID string, apiKey string) (VideoDetails, error) {
 	return details, nil
 }
 
-func (h handler) GetVideoYt(w http.ResponseWriter, r *http.Request) {
+func (h handler) GetVideoYt(c *gin.Context) {
 	err := godotenv.Load()
 	if err != nil {
-		http.Error(w, "Errore nel caricamento del file .env: "+err.Error(), http.StatusInternalServerError)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Errore nel caricamento del file .env: " + err.Error()})
 		return
 	}
 
 	apiKey := os.Getenv("YOUTUBE_API_KEY")
-	query := r.URL.Query().Get("query")
+	query := c.Query("query")
 
 	if query == "" {
-		http.Error(w, "La query non può essere vuota", http.StatusBadRequest)
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "La query non può essere vuota"})
 		return
 	}
-	w.Header().Set("Access-Control-Allow-Origin", "*")
+
+	c.Header("Access-Control-Allow-Origin", "*")
 
 	endpoint := "https://www.googleapis.com/youtube/v3/search?key=" + apiKey + "&part=snippet&q=" + query + "&type=video"
 
 	resp, err := http.Get(endpoint)
 	if err != nil {
-		http.Error(w, "Errore nella richiesta HTTP a YouTube: "+err.Error(), http.StatusInternalServerError)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Errore nella richiesta HTTP a YouTube: " + err.Error()})
 		return
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		http.Error(w, "La richiesta a YouTube ha restituito uno stato non valido: "+resp.Status, http.StatusInternalServerError)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "La richiesta a YouTube ha restituito uno stato non valido: " + resp.Status})
 		return
 	}
 
 	var searchResults SearchResults
 	if err := json.NewDecoder(resp.Body).Decode(&searchResults); err != nil {
-		http.Error(w, "Errore nella lettura del corpo della risposta: "+err.Error(), http.StatusInternalServerError)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Errore nella lettura del corpo della risposta: " + err.Error()})
 		return
 	}
 
@@ -137,25 +139,18 @@ func (h handler) GetVideoYt(w http.ResponseWriter, r *http.Request) {
 		videoID := item.ID.VideoID
 		videoDetails, err := getVideoDetails(videoID, apiKey)
 		if err != nil {
-			http.Error(w, "Errore nell'ottenere i dettagli del video: "+err.Error(), http.StatusInternalServerError)
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Errore nell'ottenere i dettagli del video: " + err.Error()})
 			return
 		}
 		if len(videoDetails.Items) > 0 {
 			durationInSeconds, err := parseDurationToSeconds(videoDetails.Items[0].ContentDetails.Duration)
 			if err != nil {
-				http.Error(w, "Errore nella conversione della durata: "+err.Error(), http.StatusInternalServerError)
+				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Errore nella conversione della durata: " + err.Error()})
 				return
 			}
 			searchResults.Items[i].Snippet.Duration = durationInSeconds
 		}
 	}
 
-	responseJSON, err := json.Marshal(searchResults)
-	if err != nil {
-		http.Error(w, "Errore nella serializzazione della risposta JSON: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(responseJSON)
+	c.JSON(http.StatusOK, searchResults)
 }

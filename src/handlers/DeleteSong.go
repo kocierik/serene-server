@@ -6,13 +6,12 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/gorilla/mux"
+	"github.com/gin-gonic/gin"
 	"github.com/kocierik/SwiftServe/src/models"
 )
 
-func (h handler) DeleteSong(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id, _ := strconv.Atoi(vars["id"])
+func (h handler) DeleteSong(c *gin.Context) {
+	id, _ := strconv.Atoi(c.Param("id"))
 
 	var song models.Music
 
@@ -21,7 +20,7 @@ func (h handler) DeleteSong(w http.ResponseWriter, r *http.Request) {
 	}
 
 	h.DB.Delete(&song)
-	w.Header().Add("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode("Deleted")
+	c.Header("Content-Type", "application/json")
+	c.Status(http.StatusOK)
+	json.NewEncoder(c.Writer).Encode("Deleted")
 }

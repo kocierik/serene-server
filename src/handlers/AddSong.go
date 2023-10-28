@@ -6,21 +6,22 @@ import (
 	"net/http"
 
 	"github.com/dhowden/tag"
+	"github.com/gin-gonic/gin"
 	"github.com/kocierik/SwiftServe/src/models"
 	"github.com/kocierik/SwiftServe/src/utils"
 )
 
-func (h handler) AddSong(w http.ResponseWriter, r *http.Request) {
-	mp3File, _, err := r.FormFile("song")
+func (h handler) AddSong(c *gin.Context) {
+	mp3File, _, err := c.Request.FormFile("song")
 	if err != nil {
-		http.Error(w, "Failed to read file", http.StatusBadRequest)
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Failed to read file"})
 		return
 	}
 	defer mp3File.Close()
 
 	mp3Tag, err := tag.ReadFrom(mp3File)
 	if err != nil {
-		http.Error(w, "Failed to read MP3 tags", http.StatusBadRequest)
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Failed to read MP3 tags"})
 		return
 	}
 	songDuration := utils.GetLengthSong(mp3File)
@@ -34,12 +35,12 @@ func (h handler) AddSong(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if result := h.DB.Create(&song); result.Error != nil {
-		http.Error(w, "Failed to save metadata to the database", http.StatusInternalServerError)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to save metadata to the database"})
 		return
 	}
 
 	fmt.Println("DONE: POST ADD SONG")
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(song)
+	c.Header("Content-Type", "application/json")
+	c.Status(http.StatusCreated)
+	json.NewEncoder(c.Writer).Encode(song)
 }

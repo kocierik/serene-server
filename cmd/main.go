@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/gorilla/mux"
+	"github.com/gin-gonic/gin"
 	"github.com/kocierik/SwiftServe/src/db"
 	"github.com/kocierik/SwiftServe/src/handlers"
 )
@@ -12,16 +12,32 @@ import (
 func main() {
 	DB := db.Init()
 	h := handlers.New(DB)
-	router := mux.NewRouter()
+	router := gin.Default()
 
-	router.HandleFunc("/songs", h.GetAllSongs).Methods(http.MethodGet)
-	router.HandleFunc("/songs/{id}", h.GetSongById).Methods(http.MethodGet)
-	router.HandleFunc("/songs", h.AddSong).Methods(http.MethodPost)
-	router.HandleFunc("/songName/{songName}", h.GetSongByArtistTitle).Methods(http.MethodGet)
-	router.HandleFunc("/songs/{id}", h.UpdateSong).Methods(http.MethodPut)
-	router.HandleFunc("/songs/{id}", h.DeleteSong).Methods(http.MethodDelete)
-	router.HandleFunc("/search", h.GetVideoYt).Methods(http.MethodGet)
-	router.HandleFunc("/downloadSong", h.DownloadSong).Methods(http.MethodGet)
+	router.GET("/songs", func(c *gin.Context) {
+		h.GetAllSongs(c)
+	})
+	router.GET("/songs/:id", func(c *gin.Context) {
+		h.GetSongById(c)
+	})
+	router.POST("/songs", func(c *gin.Context) {
+		h.AddSong(c)
+	})
+	router.GET("/songName/:songName", func(c *gin.Context) {
+		h.GetSongByArtistTitle(c)
+	})
+	router.PUT("/songs/:id", func(c *gin.Context) {
+		h.UpdateSong(c)
+	})
+	router.DELETE("/songs/:id", func(c *gin.Context) {
+		h.DeleteSong(c)
+	})
+	router.GET("/search", func(c *gin.Context) {
+		h.GetVideoYt(c)
+	})
+	router.GET("/downloadSong", func(c *gin.Context) {
+		h.DownloadSong(c)
+	})
 
 	log.Println("API is running...    port 4000")
 	http.ListenAndServe(":4000", router)
