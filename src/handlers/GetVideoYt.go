@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -66,8 +67,11 @@ type SearchResults struct {
 }
 
 func parseDurationToSeconds(duration string) (int, error) {
-	var minutes, seconds int
+	if strings.Contains(duration, "H") {
+		return 0, nil
+	}
 
+	var minutes, seconds int
 	_, err := fmt.Sscanf(duration, "PT%dM%dS", &minutes, &seconds)
 	if err != nil {
 		return 0, err
@@ -115,7 +119,7 @@ func (h handler) GetVideoYt(c *gin.Context) {
 
 	c.Header("Access-Control-Allow-Origin", "*")
 
-	endpoint := "https://www.googleapis.com/youtube/v3/search?key=" + apiKey + "&part=snippet&q=" + query + "&type=video"
+	endpoint := "https://www.googleapis.com/youtube/v3/search?key=" + apiKey + "&part=snippet&q=" + query + "&type=video&maxResults=10"
 
 	resp, err := http.Get(endpoint)
 	if err != nil {
@@ -144,11 +148,13 @@ func (h handler) GetVideoYt(c *gin.Context) {
 		}
 		if len(videoDetails.Items) > 0 {
 			durationInSeconds, err := parseDurationToSeconds(videoDetails.Items[0].ContentDetails.Duration)
-			if err != nil {
-				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Errore nella conversione della durata: " + err.Error()})
-				return
+			if durationInSeconds < 600 {
+				if err != nil {
+					c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Errore nella conversione della durata"})
+					return
+				}
+				searchResults.Items[i].Snippet.Duration = durationInSeconds
 			}
-			searchResults.Items[i].Snippet.Duration = durationInSeconds
 		}
 	}
 
