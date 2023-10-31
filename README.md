@@ -61,3 +61,14 @@ services:
 volumes:
   postgres-data:
 ```
+
+### Note
+
+If you are running the application locally for development, make sure you have the following dependencies installed on your system:
+
+- [exiftool](https://exiftool.org/)
+- [yt-dlp](https://github.com/yt-dlp/yt-dlp)
+- [id3v2](http://manpages.ubuntu.com/manpages/trusty/man1/id3v2.1.html)
+
+These dependencies are required for certain functionality of the application. Ensure they are properly installed and available in your system's PATH.
+
