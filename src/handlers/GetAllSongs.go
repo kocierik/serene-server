@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/kocierik/SwiftServe/src/models"
+	"github.com/kocierik/serene-server/src/models"
 )
 
 type Response struct {

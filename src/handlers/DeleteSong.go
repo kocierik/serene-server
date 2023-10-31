@@ -7,7 +7,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/kocierik/SwiftServe/src/models"
+	"github.com/kocierik/serene-server/src/models"
 )
 
 func (h handler) DeleteSong(c *gin.Context) {

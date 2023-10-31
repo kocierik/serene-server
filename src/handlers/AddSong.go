@@ -7,8 +7,8 @@ import (
 
 	"github.com/dhowden/tag"
 	"github.com/gin-gonic/gin"
-	"github.com/kocierik/SwiftServe/src/models"
-	"github.com/kocierik/SwiftServe/src/utils"
+	"github.com/kocierik/serene-server/src/models"
+	"github.com/kocierik/serene-server/src/utils"
 )
 
 func (h handler) AddSong(c *gin.Context) {

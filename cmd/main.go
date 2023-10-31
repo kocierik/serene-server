@@ -5,8 +5,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/kocierik/SwiftServe/src/db"
-	"github.com/kocierik/SwiftServe/src/handlers"
+	"github.com/kocierik/serene-server/src/db"
+	"github.com/kocierik/serene-server/src/handlers"
 )
 
 func main() {
