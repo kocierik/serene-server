@@ -31,9 +31,9 @@ if [ $? -eq 0 ]; then
   id3v2 --TLEN "$duration" "$new_filename"
 
 
-  echo "Download completato con successo. File rinominato in: $new_filename"
+  echo "Download completed. renamed in: $new_filename"
 else
-  echo "Errore durante il download del video da YouTube."
+  echo "Error during YouTube video downloading."
   exit 1
 fi
 
