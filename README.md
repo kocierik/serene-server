@@ -10,7 +10,7 @@ Before you begin, make sure you have Go installed.
 go build cmd/main.go
 ```
 
-### Run with Docker
+### Run with Docker compose
 
 You can use Docker Compose to run the server alongside the client. Here's a Docker Compose configuration:
 
