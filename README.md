@@ -32,7 +32,7 @@ services:
 
   frontend:
     build:
-      context: ./swiftFrontend
+      context: ./serene-client
       dockerfile: Dockerfile
     container_name: frontend
     ports:
@@ -42,7 +42,7 @@ services:
 
   backend:
     build:
-      context: ./swiftBackend
+      context: ./serene-server
       dockerfile: Dockerfile
     container_name: backend
     environment:
