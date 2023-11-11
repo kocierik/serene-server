@@ -12,7 +12,7 @@ go build cmd/main.go
 
 ### Run with Docker compose
 
-You can use Docker Compose to run the server alongside the client. Here's a Docker Compose configuration:
+You can use Docker Compose to run the server alongside the [client](https://github.com/kocierik/serene-client). Here's a Docker Compose configuration:
 
 ```yaml
 version: '3.8'
